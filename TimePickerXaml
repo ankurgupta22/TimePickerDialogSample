@@ -1,0 +1,5 @@
+Hi Lucas, thanks for the help but somehow its not working, below is my code snippet
+
+// .xaml
+
+<customcontrols:TimePicker24H Grid.Column="0" Grid.Row="0" Time="{Binding StartTime}"  HorizontalOptions="FillAndExpand" AutomationId="Flightroute_Depart_Time" Format="HHmm" BackgroundColor="White" TextColor="Black"/>

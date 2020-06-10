@@ -1,0 +1,74 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+using Android.App;
+using Android.Content;
+using Android.OS;
+using Android.Runtime;
+using Android.Views;
+using Android.Widget;
+using SWAPA.MemberMobileApp.UI.Common.CustomControls;
+using SWAPA.MemberMobileApp.UI.Droid.CustomRenderers;
+using Xamarin.Forms;
+using Xamarin.Forms.Platform.Android;
+
+[assembly: ExportRenderer(typeof(TimePicker24H), typeof(TimePicker24HRenderer))]
+namespace SWAPA.MemberMobileApp.UI.Droid.CustomRenderers
+{
+    public class TimePicker24HRenderer : ViewRenderer<Xamarin.Forms.TimePicker, Android.Widget.EditText>, TimePickerDialog.IOnTimeSetListener, IJavaObject, IDisposable
+    {
+        private TimePickerDialog dialog = null;
+        private Context localContext;
+        private AlertDialog _dialog;
+
+        IElementController ElementController => Element as IElementController;
+
+        public TimePicker24HRenderer(Context context) : base(context)
+        {
+            localContext = context;
+        }
+        protected override void OnElementChanged(ElementChangedEventArgs<Xamarin.Forms.TimePicker> e)
+        {
+            base.OnElementChanged(e);
+            this.SetNativeControl(new Android.Widget.EditText(localContext));
+            this.Control.Click += Control_Click;
+            this.Control.Text = DateTime.Now.ToString("HH:mm");
+            this.Control.KeyListener = null;
+            this.Control.FocusChange += Control_FocusChange;
+            this.Control.InputType = Android.Text.InputTypes.Null;
+        }
+        void Control_FocusChange(object sender, Android.Views.View.FocusChangeEventArgs e)
+        {
+            if (e.HasFocus)
+                ShowTimePicker();
+        }
+        void Control_Click(object sender, EventArgs e)
+        {
+            ShowTimePicker();
+        }
+        private void ShowTimePicker()
+        {
+            Xamarin.Forms.TimePicker model = Element;
+
+            Android.Widget.TimePicker picker = new Android.Widget.TimePicker(localContext);
+
+            picker.DescendantFocusability = DescendantFocusability.BlockDescendants;  // block keyboard here 
+            if (dialog == null)
+            {
+                dialog = new TimePickerDialog(localContext, this, DateTime.Now.Hour, DateTime.Now.Minute, true);
+            }
+            dialog.Show();
+
+        }
+        public void OnTimeSet(Android.Widget.TimePicker view, int hourOfDay, int minute)
+        {
+            var time = new TimeSpan(hourOfDay, minute, 0);
+            this.Element.SetValue(Xamarin.Forms.TimePicker.TimeProperty, time);
+            this.Control.Text = time.Hours < 10 ? "0" + time.Hours.ToString() + ":" + time.Minutes.ToString() : time.Hours.ToString() + ":" + time.Minutes.ToString();
+        }
+
+        
+    }
+}
